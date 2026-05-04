@@ -1,0 +1,115 @@
+name: test
+
+# pandoc has no Python source — the HTTP surface is
+# entirely defined in config/tools.yaml. CI runs:
+#
+#  - tests/test_config.py: structural checks on the YAML, so
+#    a careless edit can't ship a malformed config that only
+#    surfaces at container start.
+#  - tests/test_e2e.py: brings up the locally-built image
+#    and walks a representative round-trip via the md ->
+#    html / rst / docx subset, plus /v1/formats discovery
+#    and the standalone / from form-field flags. Other
+#    writers are pinned structurally by test_config.py.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Nightly catches a url2code:latest base-image regression
+  # or a pandoc apt-package change that breaks the
+  # conversion path — without waiting for the next push.
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python3 -m pip install -r tests/requirements.txt
+      - run: python3 -m pytest tests/test_config.py -v
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [yaml]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: configure docker for plain-HTTP kibble registry
+        # pandoc's Dockerfile pulls cobdfamily/url2code
+        # from kibble. The kibble registry speaks plain HTTP;
+        # the runner's docker daemon defaults to HTTPS-only,
+        # so flag kibble as insecure before any pull.
+        run: |
+          sudo mkdir -p /etc/docker
+          echo '{"insecure-registries":["kibble.apps.blindhub.ca"]}' \
+            | sudo tee /etc/docker/daemon.json >/dev/null
+          sudo systemctl restart docker
+          for i in $(seq 1 30); do
+            docker info >/dev/null 2>&1 && break
+            sleep 1
+          done
+
+      - name: set up buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          buildkitd-config-inline: |
+            [registry."kibble.apps.blindhub.ca"]
+              http = true
+              insecure = true
+
+      - name: build image (loaded into local docker)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          # Only amd64 in CI — the runner is amd64 and a
+          # multi-arch CI build doubles wall-time without
+          # changing what the build can prove. release.yml
+          # publishes both arches.
+          platforms: linux/amd64
+          tags: kibble.apps.blindhub.ca/cobdfamily/pandoc:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: bring up stack
+        # Compose pulls ``pandoc:latest`` by default;
+        # the build step above tagged the local image with
+        # that name, so this is a no-network up.
+        run: docker compose up -d
+
+      - name: install python test deps
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r tests/requirements.txt
+
+      - name: wait for pandoc ready
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:8000/ >/dev/null 2>&1; then
+              echo "pandoc ready"; exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::pandoc failed to come up in 180s"
+          docker compose ps
+          docker compose logs --tail=200
+          exit 1
+
+      - name: run E2E tests
+        run: python3 -m pytest tests/test_e2e.py -v
+
+      - name: dump logs on failure
+        if: failure()
+        run: docker compose logs --tail=300
+
+      - name: tear down
+        if: always()
+        run: docker compose down -v

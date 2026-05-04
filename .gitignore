@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Tests scratch
+tests/.venv/
+
+# Editor / OS
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Document scratch — sample inputs / outputs developers
+# drop in for ad-hoc testing. Test fixtures used by
+# tests/test_e2e.py are generated at runtime.
+*.md
+!README.md
+!CHANGELOG.md
+!DEPLOYMENT.md
+*.markdown
+*.html
+*.htm
+*.xhtml
+*.rst
+*.adoc
+*.asciidoc
+*.org
+*.textile
+*.mediawiki
+*.dokuwiki
+*.docx
+*.doc
+*.odt
+*.rtf
+*.epub
+*.fb2
+*.tex
+*.latex
+*.dbk
+*.docbook
+*.xml
+!.github/**/*.yml
+*.opml
+*.ipynb
+*.texi
+*.texinfo
+*.ms
+*.1
+*.json
+!package.json
+!tsconfig.json
+*.txt
+!tests/**/*.txt

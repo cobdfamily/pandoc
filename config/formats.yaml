@@ -1,0 +1,229 @@
+# Curated catalog of pandoc writers this deployment exposes.
+#
+# This file is the canonical source of truth for the format
+# list. tools.yaml's per-format /to/<slug> endpoints are
+# checked against it by tests in CI -- editing the catalog
+# without updating the YAML (or vice versa) fails before
+# merge.
+#
+# /formats serves this file (converted to JSON on the wire by
+# /app/bin/cat-yaml-as-json from the url2code base) so
+# consumers can discover supported targets without reading
+# the README.
+#
+# Per-entry fields:
+#   slug    URL-safe identifier; becomes the route suffix
+#           (/to/<slug>) and is the public name of the
+#           target.
+#   ext     File extension on the generated download_url.
+#           Many slugs share an extension (md / gfm /
+#           commonmark all -> .md; html / revealjs / html4
+#           all -> .html).
+#   writer  pandoc's writer name (passed to ``-t <writer>``);
+#           run ``pandoc --list-output-formats`` for the
+#           full set.
+#   name    Human-readable label (for clients).
+#   family  Grouping for documentation. One of:
+#             markdown   markdown + lightweight markup
+#             document   word-processing / e-book formats
+#             web        HTML
+#             print      print / typesetting source
+#             structured XML / structured-text formats
+#             slides     slideshow formats
+#             other      catch-all (plain, json AST)
+#
+# Adding a format:
+#   1. Add an entry below.
+#   2. Add the matching `to-<slug>` endpoint block to
+#      tools.yaml (copy any existing block, change the
+#      route, suffix, and the third command arg to the
+#      new writer).
+# CI fails fast if (1) and (2) drift.
+
+# ===== markdown / lightweight markup =====
+
+- slug: md
+  ext: md
+  writer: markdown
+  name: Markdown (CommonMark + pandoc extensions)
+  family: markdown
+
+- slug: gfm
+  ext: md
+  writer: gfm
+  name: GitHub Flavored Markdown
+  family: markdown
+
+- slug: commonmark
+  ext: md
+  writer: commonmark
+  name: CommonMark (strict)
+  family: markdown
+
+- slug: rst
+  ext: rst
+  writer: rst
+  name: reStructuredText
+  family: markdown
+
+- slug: asciidoc
+  ext: adoc
+  writer: asciidoc
+  name: AsciiDoc
+  family: markdown
+
+- slug: org
+  ext: org
+  writer: org
+  name: Emacs Org-mode
+  family: markdown
+
+- slug: textile
+  ext: textile
+  writer: textile
+  name: Textile
+  family: markdown
+
+- slug: mediawiki
+  ext: mediawiki
+  writer: mediawiki
+  name: MediaWiki markup
+  family: markdown
+
+- slug: dokuwiki
+  ext: txt
+  writer: dokuwiki
+  name: DokuWiki markup
+  family: markdown
+
+# ===== document / e-book =====
+
+- slug: docx
+  ext: docx
+  writer: docx
+  name: Microsoft Word OOXML
+  family: document
+
+- slug: odt
+  ext: odt
+  writer: odt
+  name: OpenDocument Text
+  family: document
+
+- slug: rtf
+  ext: rtf
+  writer: rtf
+  name: Rich Text Format
+  family: document
+
+- slug: epub
+  ext: epub
+  writer: epub3
+  name: EPUB 3
+  family: document
+
+- slug: epub2
+  ext: epub
+  writer: epub2
+  name: EPUB 2
+  family: document
+
+- slug: fb2
+  ext: fb2
+  writer: fb2
+  name: FictionBook 2
+  family: document
+
+# ===== web =====
+
+- slug: html
+  ext: html
+  writer: html5
+  name: HTML5
+  family: web
+
+- slug: html4
+  ext: html
+  writer: html4
+  name: HTML 4
+  family: web
+
+# ===== print / typesetting source =====
+
+- slug: latex
+  ext: tex
+  writer: latex
+  name: LaTeX
+  family: print
+
+- slug: man
+  ext: "1"
+  writer: man
+  name: Groff man page
+  family: print
+
+- slug: ms
+  ext: ms
+  writer: ms
+  name: Groff -ms macros
+  family: print
+
+- slug: texinfo
+  ext: texi
+  writer: texinfo
+  name: Texinfo
+  family: print
+
+# ===== structured / XML =====
+
+- slug: docbook
+  ext: dbk
+  writer: docbook5
+  name: DocBook 5
+  family: structured
+
+- slug: jats
+  ext: xml
+  writer: jats
+  name: JATS (Journal Article Tag Suite)
+  family: structured
+
+- slug: opml
+  ext: opml
+  writer: opml
+  name: OPML (Outline Processor Markup Language)
+  family: structured
+
+- slug: ipynb
+  ext: ipynb
+  writer: ipynb
+  name: Jupyter Notebook
+  family: structured
+
+# ===== slides =====
+
+- slug: revealjs
+  ext: html
+  writer: revealjs
+  name: reveal.js HTML5 slideshow
+  family: slides
+
+- slug: beamer
+  ext: tex
+  writer: beamer
+  name: LaTeX Beamer slides
+  family: slides
+
+# ===== other =====
+
+- slug: plain
+  ext: txt
+  writer: plain
+  name: Plain text
+  family: other
+
+- slug: json
+  ext: json
+  writer: json
+  name: pandoc JSON AST
+  family: other

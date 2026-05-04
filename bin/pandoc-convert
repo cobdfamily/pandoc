@@ -1,0 +1,51 @@
+#!/bin/sh
+# Thin wrapper around pandoc that bridges:
+#
+# 1. pandoc accepts the source format either explicitly
+#    (--from / -f) or by auto-detecting from the upload's
+#    filename extension. url2code preserves the original
+#    extension on the saved upload, so auto-detect works
+#    out of the box. This wrapper takes the *target* format
+#    as a positional arg and any flag-rendered extras (-f,
+#    -s, ...) come through ``$@`` from url2code's flag
+#    rendering.
+#
+# 2. stderr -> stdout. pandoc writes warnings and errors
+#    to stderr; url2code's text-mode parser only reads
+#    stdout. The ``2>&1`` makes failures visible in the
+#    response body.
+#
+# 3. ``-o`` is explicit. url2code generates an output path
+#    that may contain characters pandoc would mistake for
+#    a positional arg ordering. Passing it via ``-o`` is
+#    unambiguous.
+#
+# usage:
+#   pandoc-convert <input_path> <output_path> <writer> [extra_args...]
+#
+# extra_args are forwarded verbatim to pandoc *before* the
+# input path, so url2code's flag rendering can append
+# ``-f markdown -s`` etc.
+
+set -e
+
+INPUT="$1"
+OUTPUT="$2"
+WRITER="$3"
+shift 3 || true
+
+if [ -z "$INPUT" ] || [ -z "$OUTPUT" ] || [ -z "$WRITER" ]; then
+    echo "usage: pandoc-convert <input> <output> <writer> [extra...]" >&2
+    exit 64
+fi
+
+if [ ! -f "$INPUT" ]; then
+    echo "input file does not exist: $INPUT" >&2
+    exit 66
+fi
+
+exec pandoc \
+    -t "$WRITER" \
+    -o "$OUTPUT" \
+    "$@" \
+    "$INPUT" 2>&1

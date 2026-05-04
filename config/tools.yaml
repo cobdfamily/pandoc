@@ -1,0 +1,1156 @@
+# pandoc -- universal document conversion via pandoc CLI.
+#
+# One route per supported target writer, all under /v1/to/<slug>,
+# plus /v1/formats discovery. Source format auto-detected from
+# the upload's filename extension; override with the `from` form
+# field. Each route returns JSON containing a download_url for
+# the converted output.
+#
+# Per-format details (slug, file extension, pandoc writer name,
+# human label, family grouping) live in config/formats.yaml --
+# the canonical catalog. tools.yaml's /to/<slug> endpoints are
+# checked against it by tests in CI; drift fails before merge.
+#
+# The wrapper at /app/bin/pandoc-convert handles three pandoc
+# quirks (see the wrapper's header comment for the full
+# rationale):
+#
+#   1. Source-format auto-detection from the upload's preserved
+#      filename extension; --from / -f overrides via `from`
+#      form field.
+#   2. stderr -> stdout merge so url2code's text-mode parser
+#      surfaces failures.
+#   3. Explicit -o for the output path.
+#
+# `from` and `standalone` are exposed as request flags. 
+# `standalone` defaults to true (most consumers want a complete
+# document, not a fragment); pass standalone=false for fragments.
+
+api:
+  title: pandoc
+  default_root: /v1
+
+logging:
+  level: INFO
+
+endpoints:
+
+  # ====================================================================
+  # /formats -- discovery: the writer catalog
+  # ====================================================================
+
+  - name: formats
+    route: /formats
+    method: GET
+    description: >-
+      Return the curated catalog of supported target formats.
+      Each entry is a {slug, ext, writer, name, family} object;
+      pass the `slug` field as the path suffix on /to/<slug>.
+    command:
+      executable: /app/bin/cat-yaml-as-json
+      args:
+        - "/app/config/formats.yaml"
+      timeout_seconds: 5
+    output:
+      mode: native_json
+
+  # ====================================================================
+  # markdown
+  # ====================================================================
+
+  - name: to-md
+    route: /to/md
+    method: POST
+    description: >-
+      Convert an uploaded document to Markdown (CommonMark + pandoc extensions). Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "markdown"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .md
+    output:
+      mode: text
+
+  - name: to-gfm
+    route: /to/gfm
+    method: POST
+    description: >-
+      Convert an uploaded document to GitHub Flavored Markdown. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "gfm"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .md
+    output:
+      mode: text
+
+  - name: to-commonmark
+    route: /to/commonmark
+    method: POST
+    description: >-
+      Convert an uploaded document to CommonMark (strict). Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "commonmark"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .md
+    output:
+      mode: text
+
+  - name: to-rst
+    route: /to/rst
+    method: POST
+    description: >-
+      Convert an uploaded document to reStructuredText. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "rst"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .rst
+    output:
+      mode: text
+
+  - name: to-asciidoc
+    route: /to/asciidoc
+    method: POST
+    description: >-
+      Convert an uploaded document to AsciiDoc. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "asciidoc"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .adoc
+    output:
+      mode: text
+
+  - name: to-org
+    route: /to/org
+    method: POST
+    description: >-
+      Convert an uploaded document to Emacs Org-mode. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "org"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .org
+    output:
+      mode: text
+
+  - name: to-textile
+    route: /to/textile
+    method: POST
+    description: >-
+      Convert an uploaded document to Textile. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "textile"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .textile
+    output:
+      mode: text
+
+  - name: to-mediawiki
+    route: /to/mediawiki
+    method: POST
+    description: >-
+      Convert an uploaded document to MediaWiki markup. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "mediawiki"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .mediawiki
+    output:
+      mode: text
+
+  - name: to-dokuwiki
+    route: /to/dokuwiki
+    method: POST
+    description: >-
+      Convert an uploaded document to DokuWiki markup. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "dokuwiki"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .txt
+    output:
+      mode: text
+
+  # ====================================================================
+  # document
+  # ====================================================================
+
+  - name: to-docx
+    route: /to/docx
+    method: POST
+    description: >-
+      Convert an uploaded document to Microsoft Word OOXML. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "docx"
+      timeout_seconds: 60
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .docx
+    output:
+      mode: text
+
+  - name: to-odt
+    route: /to/odt
+    method: POST
+    description: >-
+      Convert an uploaded document to OpenDocument Text. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "odt"
+      timeout_seconds: 60
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .odt
+    output:
+      mode: text
+
+  - name: to-rtf
+    route: /to/rtf
+    method: POST
+    description: >-
+      Convert an uploaded document to Rich Text Format. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "rtf"
+      timeout_seconds: 60
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .rtf
+    output:
+      mode: text
+
+  - name: to-epub
+    route: /to/epub
+    method: POST
+    description: >-
+      Convert an uploaded document to EPUB 3. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "epub3"
+      timeout_seconds: 60
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .epub
+    output:
+      mode: text
+
+  - name: to-epub2
+    route: /to/epub2
+    method: POST
+    description: >-
+      Convert an uploaded document to EPUB 2. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "epub2"
+      timeout_seconds: 60
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .epub
+    output:
+      mode: text
+
+  - name: to-fb2
+    route: /to/fb2
+    method: POST
+    description: >-
+      Convert an uploaded document to FictionBook 2. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "fb2"
+      timeout_seconds: 60
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .fb2
+    output:
+      mode: text
+
+  # ====================================================================
+  # web
+  # ====================================================================
+
+  - name: to-html
+    route: /to/html
+    method: POST
+    description: >-
+      Convert an uploaded document to HTML5. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "html5"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .html
+    output:
+      mode: text
+
+  - name: to-html4
+    route: /to/html4
+    method: POST
+    description: >-
+      Convert an uploaded document to HTML 4. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "html4"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .html
+    output:
+      mode: text
+
+  # ====================================================================
+  # print
+  # ====================================================================
+
+  - name: to-latex
+    route: /to/latex
+    method: POST
+    description: >-
+      Convert an uploaded document to LaTeX. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "latex"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .tex
+    output:
+      mode: text
+
+  - name: to-man
+    route: /to/man
+    method: POST
+    description: >-
+      Convert an uploaded document to Groff man page. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "man"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: ".1"
+    output:
+      mode: text
+
+  - name: to-ms
+    route: /to/ms
+    method: POST
+    description: >-
+      Convert an uploaded document to Groff -ms macros. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "ms"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .ms
+    output:
+      mode: text
+
+  - name: to-texinfo
+    route: /to/texinfo
+    method: POST
+    description: >-
+      Convert an uploaded document to Texinfo. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "texinfo"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .texi
+    output:
+      mode: text
+
+  # ====================================================================
+  # structured
+  # ====================================================================
+
+  - name: to-docbook
+    route: /to/docbook
+    method: POST
+    description: >-
+      Convert an uploaded document to DocBook 5. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "docbook5"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .dbk
+    output:
+      mode: text
+
+  - name: to-jats
+    route: /to/jats
+    method: POST
+    description: >-
+      Convert an uploaded document to JATS (Journal Article Tag Suite). Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "jats"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .xml
+    output:
+      mode: text
+
+  - name: to-opml
+    route: /to/opml
+    method: POST
+    description: >-
+      Convert an uploaded document to OPML (Outline Processor Markup Language). Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "opml"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .opml
+    output:
+      mode: text
+
+  - name: to-ipynb
+    route: /to/ipynb
+    method: POST
+    description: >-
+      Convert an uploaded document to Jupyter Notebook. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "ipynb"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .ipynb
+    output:
+      mode: text
+
+  # ====================================================================
+  # slides
+  # ====================================================================
+
+  - name: to-revealjs
+    route: /to/revealjs
+    method: POST
+    description: >-
+      Convert an uploaded document to reveal.js HTML5 slideshow. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "revealjs"
+      timeout_seconds: 60
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .html
+    output:
+      mode: text
+
+  - name: to-beamer
+    route: /to/beamer
+    method: POST
+    description: >-
+      Convert an uploaded document to LaTeX Beamer slides. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "beamer"
+      timeout_seconds: 60
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .tex
+    output:
+      mode: text
+
+  # ====================================================================
+  # other
+  # ====================================================================
+
+  - name: to-plain
+    route: /to/plain
+    method: POST
+    description: >-
+      Convert an uploaded document to Plain text. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "plain"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .txt
+    output:
+      mode: text
+
+  - name: to-json
+    route: /to/json
+    method: POST
+    description: >-
+      Convert an uploaded document to pandoc JSON AST. Source
+      format auto-detected from the upload's filename
+      extension; pass form field `from` (e.g. markdown,
+      rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "json"
+      timeout_seconds: 30
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .json
+    output:
+      mode: text
