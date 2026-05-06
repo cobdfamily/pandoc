@@ -2,9 +2,7 @@
 
 [![test](https://github.com/cobdfamily/pandoc/actions/workflows/test.yml/badge.svg)](https://github.com/cobdfamily/pandoc/actions/workflows/test.yml)
 
-Universal document conversion service. A document in,
-the same document in a different format out — driven
-by `pandoc`.
+A simple pandoc-driven document conversion API.
 
 This is a YAML-defined microservice — no Python source
 in the repo, only tests. The HTTP surface lives in
