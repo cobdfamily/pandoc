@@ -25,6 +25,7 @@ tests/.venv/
 !README.md
 !CHANGELOG.md
 !DEPLOYMENT.md
+!COMMENTS.md
 *.markdown
 *.html
 *.htm
