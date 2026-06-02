@@ -78,6 +78,29 @@ rather than a fragment. Pass `standalone=false` to get
 just the body content -- useful when embedding the
 output in a template.
 
+## Citations (citeproc)
+
+Attach a bibliography and pandoc resolves `[@key]` citations and
+appends a reference list. Both inputs are **optional uploads** —
+omit them and you get a plain conversion:
+
+```sh
+curl -fsS -X POST \
+     -F document=@./paper.md \
+     -F bibliography=@./refs.bib \
+     http://localhost:8000/v1/to/html | jq
+```
+
+- **`bibliography`** (optional file) — any format pandoc reads
+  (`.bib`, CSL `.json`, `.yaml`, ...). When present, the wrapper
+  runs pandoc with `--citeproc --bibliography=<file>`.
+- **`csl`** (optional file) — a Citation Style Language `.csl`
+  controlling citation/reference formatting (`--csl=<file>`);
+  pandoc's default style is used when omitted.
+
+Available on every `/v1/to/<slug>` target (html, pdf, docx, ...).
+Requires url2code ≥ 2.1.0 (optional uploads).
+
 ## Quick start
 
 ```sh
@@ -133,12 +156,6 @@ curl -fsS -X POST \
   (Traefik / nginx) — see DEPLOYMENT.md.
 - **No persistence.** Uploads and converted outputs
   live in `/tmp` and are wiped on container restart.
-- **No bibliography / citation processing yet.** pandoc
-  supports `--citeproc` / `--bibliography`, but wiring a
-  bibliography file in needs an *optional* upload, which
-  url2code doesn't support yet (uploads are mandatory) —
-  so citeproc needs either a dedicated endpoint or a new
-  engine feature. Tracked as a follow-up.
 - **No cross-format batching.** One request, one
   conversion.
 

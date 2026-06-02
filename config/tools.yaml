@@ -28,7 +28,7 @@
 
 api:
   title: pandoc
-  version: "1.1.1"
+  version: "1.2.0"
   default_root: /v1
 
 logging:
@@ -75,6 +75,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "markdown"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -88,6 +90,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -112,6 +122,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "gfm"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -125,6 +137,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -149,6 +169,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "commonmark"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -162,6 +184,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -186,6 +216,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "rst"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -199,6 +231,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -223,6 +263,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "asciidoc"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -236,6 +278,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -260,6 +310,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "org"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -273,6 +325,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -297,6 +357,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "textile"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -310,6 +372,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -334,6 +404,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "mediawiki"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -347,6 +419,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -371,6 +451,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "dokuwiki"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -384,6 +466,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -412,6 +502,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "docx"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 60
     request:
       flags:
@@ -425,6 +517,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -449,6 +549,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "odt"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 60
     request:
       flags:
@@ -462,6 +564,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -486,6 +596,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "rtf"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 60
     request:
       flags:
@@ -499,6 +611,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -523,6 +643,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "epub3"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 60
     request:
       flags:
@@ -536,6 +658,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -560,6 +690,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "epub2"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 60
     request:
       flags:
@@ -573,6 +705,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -597,6 +737,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "fb2"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 60
     request:
       flags:
@@ -610,6 +752,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -638,6 +788,8 @@ endpoints:
       # PDF rendering (HTML layout + paint) is heavier than a
       # text-writer pass, so a roomier ceiling than the 30s
       # default.
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 120
     request:
       flags:
@@ -651,6 +803,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -679,6 +839,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "html5"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -692,6 +854,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -716,6 +886,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "html4"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -729,6 +901,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -757,6 +937,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "latex"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -770,6 +952,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -794,6 +984,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "man"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -807,6 +999,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -831,6 +1031,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "ms"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -844,6 +1046,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -868,6 +1078,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "texinfo"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -881,6 +1093,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -909,6 +1129,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "docbook5"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -922,6 +1144,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -946,6 +1176,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "jats"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -959,6 +1191,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -983,6 +1223,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "opml"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -996,6 +1238,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -1020,6 +1270,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "ipynb"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -1033,6 +1285,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -1061,6 +1321,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "revealjs"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 60
     request:
       flags:
@@ -1074,6 +1336,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -1098,6 +1368,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "beamer"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 60
     request:
       flags:
@@ -1111,6 +1383,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -1139,6 +1419,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "plain"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -1152,6 +1434,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename
@@ -1176,6 +1466,8 @@ endpoints:
         - "{input_path}"
         - "{output_path}"
         - "json"
+        - '{bibliography_path}'
+        - '{csl_path}'
       timeout_seconds: 30
     request:
       flags:
@@ -1189,6 +1481,14 @@ endpoints:
       - field_name: document
         placeholder: input_path
         temp_dir: /tmp/pandoc/uploads
+      - field_name: bibliography
+        placeholder: bibliography_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
+      - field_name: csl
+        placeholder: csl_path
+        temp_dir: /tmp/pandoc/uploads
+        required: false
     output_files:
       - placeholder: output_path
         filename_placeholder: output_filename

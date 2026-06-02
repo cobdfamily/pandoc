@@ -180,6 +180,59 @@ def test_convert_md_to_pdf(source_md):
         f"not a PDF (first bytes: {converted[:8]!r})"
 
 
+def test_convert_with_citeproc_resolves_citations(tmp_path_factory):
+    """Upload a doc with a `[@key]` citation + a .bib bibliography
+    (the optional `bibliography` upload) -> pandoc runs --citeproc,
+    so the raw `[@key]` is replaced by a formatted citation and a
+    reference list naming the cited work appears."""
+    doc = tmp_path_factory.mktemp("cite") / "doc.md"
+    doc.write_text("See [@knuth1984] for details.\n", encoding="utf-8")
+    bib = tmp_path_factory.mktemp("cite") / "refs.bib"
+    bib.write_text(
+        "@book{knuth1984,\n"
+        "  author = {Knuth, Donald E.},\n"
+        "  title = {The TeXbook},\n"
+        "  year = {1984},\n"
+        "  publisher = {Addison-Wesley}\n"
+        "}\n",
+        encoding="utf-8",
+    )
+    with open(doc, "rb") as f, open(bib, "rb") as b:
+        r = requests.post(
+            f"{PANDOC_BASE_URL}/v1/to/html",
+            files={
+                "document": ("doc.md", f, "text/plain"),
+                "bibliography": ("refs.bib", b, "text/plain"),
+            },
+            timeout=60,
+        )
+    assert r.status_code == 200, r.text
+    assert r.json().get("exit_code") == 0, r.json()
+    html = _download(r).decode("utf-8", errors="replace").lower()
+    # The raw citation token is gone (citeproc resolved it)...
+    assert "[@knuth1984]" not in html
+    # ...and the cited work shows up in the rendered references.
+    assert "knuth" in html
+
+
+def test_convert_without_bibliography_is_plain(source_md):
+    """Omitting the optional `bibliography` upload -> a plain
+    conversion (no --citeproc), proving the optional upload is
+    genuinely optional. A `[@key]` stays literal."""
+    cite_src = source_md  # reuse fixture path object's dir
+    # Build a tiny doc with a citation and post WITHOUT a bib.
+    text = "Ref [@nobody2099] stays raw.\n"
+    r = requests.post(
+        f"{PANDOC_BASE_URL}/v1/to/html",
+        files={"document": ("d.md", text.encode("utf-8"), "text/plain")},
+        data={"from": "markdown"},
+        timeout=60,
+    )
+    assert r.status_code == 200, r.text
+    html = _download(r).decode("utf-8", errors="replace")
+    assert "nobody2099" in html  # unresolved -> token survives
+
+
 def test_standalone_default_produces_full_document(source_md):
     """Default standalone=true wraps with <!DOCTYPE html>.
     Pinned because a regression in the bool-flag default

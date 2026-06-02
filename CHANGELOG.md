@@ -10,6 +10,23 @@ empty and is filled forward from this point.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-01
+
+### Added
+- **Citations (citeproc).** Every `/v1/to/<slug>` endpoint now
+  accepts two optional uploads: `bibliography` (any format pandoc
+  reads) and `csl` (a Citation Style Language file). When a
+  bibliography is supplied, `bin/pandoc-convert` runs pandoc with
+  `--citeproc --bibliography=<file>` (+ `--csl=<file>` when given),
+  resolving `[@key]` citations and emitting a reference list. Omit
+  them and the conversion is unchanged. Built on url2code 2.1.0's
+  optional uploads (`required: false`).
+
+### Changed
+- Base image `1.0.8 -> 2.1.0` (needs the optional-uploads feature;
+  also brings the async executor + streamed upload I/O from 2.x).
+- `api.version` `1.1.1 -> 1.2.0`.
+
 ## [1.1.1] - 2026-06-01
 
 ### Fixed
@@ -79,6 +96,7 @@ plus this sprint's standardization work.
 - No bibliography / citeproc yet (roadmap Sprint 12). One
   conversion per request.
 
+[1.2.0]: https://github.com/cobdfamily/pandoc/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/cobdfamily/pandoc/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/cobdfamily/pandoc/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/cobdfamily/pandoc/commits/v1.0.0

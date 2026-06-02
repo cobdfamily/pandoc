@@ -146,17 +146,20 @@ def test_every_convert_endpoint_calls_pandoc_convert(convert_endpoints):
             f"{e['name']} uses unexpected executable"
 
 
-def test_every_convert_endpoint_passes_three_args(convert_endpoints):
-    """The wrapper takes exactly three positional args:
-    ``<input_path> <output_path> <writer>``. Anything beyond
-    that is appended by url2code's flag rendering at request
-    time."""
+def test_every_convert_endpoint_passes_five_args(convert_endpoints):
+    """The wrapper takes five positional args:
+    ``<input_path> <output_path> <writer> <bibliography_path>
+    <csl_path>``. The last two are the optional citeproc inputs
+    (empty strings when their optional uploads are omitted).
+    url2code's flag rendering (-f / -s) appends after these."""
     for e in convert_endpoints:
         args = e["command"]["args"]
-        assert len(args) == 3, \
-            f"{e['name']} passes {len(args)} args, expected 3"
+        assert len(args) == 5, \
+            f"{e['name']} passes {len(args)} args, expected 5"
         assert args[0] == "{input_path}"
         assert args[1] == "{output_path}"
+        assert args[3] == "{bibliography_path}"
+        assert args[4] == "{csl_path}"
 
 
 def test_writer_arg_matches_catalog(convert_endpoints, by_slug):
@@ -188,16 +191,24 @@ def test_every_convert_endpoint_has_a_timeout(convert_endpoints):
 # ---------------------------------------------------------------------------
 
 
-def test_every_convert_endpoint_has_one_document_upload(convert_endpoints):
-    """Clients shouldn't have to remember a different field
-    name per endpoint. ``document`` is the convention."""
+def test_every_convert_endpoint_has_document_and_optional_citeproc_uploads(convert_endpoints):
+    """Three uploads per endpoint: the required ``document`` plus
+    optional ``bibliography`` and ``csl`` (citeproc). ``document``
+    is the convention so clients don't memorise a field per
+    endpoint; the citeproc pair is required: false so it can be
+    omitted for a plain conversion."""
     for e in convert_endpoints:
         uploads = e.get("uploads") or []
-        assert len(uploads) == 1, \
-            f"{e['name']} has {len(uploads)} uploads, expected 1"
-        upload = uploads[0]
-        assert upload["field_name"] == "document"
-        assert upload["placeholder"] == "input_path"
+        by_field = {u["field_name"]: u for u in uploads}
+        assert set(by_field) == {"document", "bibliography", "csl"}, \
+            f"{e['name']} uploads {sorted(by_field)} != document/bibliography/csl"
+        assert by_field["document"]["placeholder"] == "input_path"
+        # document is required (default); citeproc inputs are optional.
+        assert by_field["document"].get("required", True) is True
+        assert by_field["bibliography"]["placeholder"] == "bibliography_path"
+        assert by_field["bibliography"]["required"] is False
+        assert by_field["csl"]["placeholder"] == "csl_path"
+        assert by_field["csl"]["required"] is False
 
 
 def test_input_placeholder_is_substituted(convert_endpoints):
