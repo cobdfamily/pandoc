@@ -18,7 +18,7 @@
 # the image. Operators who need PDF can layer a downstream
 # image with their preferred backend.
 
-ARG URL2CODE_TAG=latest
+ARG URL2CODE_TAG=1.0.8
 FROM kibble.apps.blindhub.ca/cobdfamily/url2code:${URL2CODE_TAG}
 
 USER root

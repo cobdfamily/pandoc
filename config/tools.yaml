@@ -28,6 +28,7 @@
 
 api:
   title: pandoc
+  version: "1.0.0"
   default_root: /v1
 
 logging:
