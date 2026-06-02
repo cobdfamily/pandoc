@@ -29,7 +29,18 @@ USER root
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         pandoc \
+        libpango-1.0-0 \
+        libpangoft2-1.0-0 \
+        fonts-dejavu-core \
  && rm -rf /var/lib/apt/lists/*
+
+# PDF output without a TeX backend: pandoc's
+# --pdf-engine=weasyprint renders HTML/CSS to PDF. weasyprint
+# is a Python package; install it into the base image's venv so
+# its `weasyprint` console script lands on PATH for pandoc to
+# invoke. The libpango* libs + a base font above are weasyprint's
+# runtime system dependencies.
+RUN uv pip install --no-cache --python /app/.venv/bin/python weasyprint
 
 # Pre-create temp tree as root + chown to runtime user so
 # upload writes and converted-output writes both succeed

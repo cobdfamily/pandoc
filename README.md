@@ -41,12 +41,12 @@ The catalog lives in
 served at `/v1/formats` (converted to JSON on the wire
 by `bin/cat-yaml-as-json` from the url2code base).
 
-29 writers, grouped by family:
+30 writers, grouped by family:
 
 - **Markdown / lightweight** (9): md, gfm, commonmark,
   rst, asciidoc, org, textile, mediawiki, dokuwiki
-- **Document / e-book** (6): docx, odt, rtf, epub,
-  epub2, fb2
+- **Document / e-book** (7): docx, odt, rtf, epub,
+  epub2, fb2, pdf
 - **Web** (2): html, html4
 - **Print / typesetting** (4): latex, man, ms, texinfo
 - **Structured / XML** (4): docbook, jats, opml, ipynb
@@ -57,15 +57,17 @@ Adding a writer is a `formats.yaml` edit + a
 `tools.yaml` edit (one new endpoint block, copying any
 existing one). CI fails fast if the two drift.
 
-### What's not exposed
+### PDF
 
-- **PDF.** pandoc's PDF path needs a TeX backend
-  (texlive, ~5 GB) or weasyprint / wkhtmltopdf. None
-  are bundled in v0.1.0 to keep the image small;
-  operators who need PDF can layer a downstream image
-  with their preferred backend. For office-format ->
-  PDF, `cobdfamily/outofoffice`'s `/v1/to/pdf` covers
-  the common cases via LibreOffice.
+`/v1/to/pdf` renders via **weasyprint** (an HTML/CSS
+engine bundled in the image) — *not* a TeX backend, so
+there's no ~5 GB texlive layer. pandoc lays the document
+out as HTML and weasyprint paints the PDF. Good for prose,
+reports, and articles; if you need LaTeX-grade math /
+typesetting, layer a downstream image with texlive and
+point `--pdf-engine` at it, or use
+`cobdfamily/outofoffice`'s LibreOffice path for
+office-document fidelity.
 
 ## The standalone flag
 
@@ -131,11 +133,12 @@ curl -fsS -X POST \
   (Traefik / nginx) — see DEPLOYMENT.md.
 - **No persistence.** Uploads and converted outputs
   live in `/tmp` and are wiped on container restart.
-- **No PDF (in v0.1.0).** See above.
-- **No bibliography / citation processing.** pandoc
-  supports `--citeproc` / `--bibliography`; not
-  exposed yet. Operators who need it can layer a
-  downstream image.
+- **No bibliography / citation processing yet.** pandoc
+  supports `--citeproc` / `--bibliography`, but wiring a
+  bibliography file in needs an *optional* upload, which
+  url2code doesn't support yet (uploads are mandatory) —
+  so citeproc needs either a dedicated endpoint or a new
+  engine feature. Tracked as a follow-up.
 - **No cross-format batching.** One request, one
   conversion.
 

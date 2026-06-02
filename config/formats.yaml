@@ -134,6 +134,12 @@
   name: FictionBook 2
   family: document
 
+- slug: pdf
+  ext: pdf
+  writer: pdf
+  name: PDF (via weasyprint, no LaTeX)
+  family: document
+
 # ===== web =====
 
 - slug: html

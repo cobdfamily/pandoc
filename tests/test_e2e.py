@@ -166,6 +166,20 @@ def test_convert_md_to_docx(source_md):
         f"not a ZIP/DOCX (first bytes: {converted[:4]!r})"
 
 
+def test_convert_md_to_pdf(source_md):
+    """``md -> pdf`` via the weasyprint engine (no LaTeX).
+    Output must carry the ``%PDF`` magic. Confirms pandoc, the
+    weasyprint pdf-engine, and its system deps all work in the
+    image."""
+    r = _convert(source_md, "pdf")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body.get("exit_code") == 0, body
+    converted = _download(r)
+    assert converted.startswith(b"%PDF"), \
+        f"not a PDF (first bytes: {converted[:8]!r})"
+
+
 def test_standalone_default_produces_full_document(source_md):
     """Default standalone=true wraps with <!DOCTYPE html>.
     Pinned because a regression in the bool-flag default

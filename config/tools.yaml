@@ -28,7 +28,7 @@
 
 api:
   title: pandoc
-  version: "1.0.0"
+  version: "1.1.0"
   default_root: /v1
 
 logging:
@@ -615,6 +615,47 @@ endpoints:
         filename_placeholder: output_filename
         output_dir: /tmp/pandoc/outputs
         suffix: .fb2
+    output:
+      mode: text
+
+  - name: to-pdf
+    route: /to/pdf
+    method: POST
+    description: >-
+      Convert an uploaded document to PDF, rendered via
+      weasyprint (an HTML/CSS engine) — no LaTeX/TeX backend
+      required. Source format auto-detected from the upload's
+      filename extension; pass form field `from` (e.g.
+      markdown, rst, html) to override.
+    defaults:
+      standalone: "true"
+    command:
+      executable: /app/bin/pandoc-convert
+      args:
+        - "{input_path}"
+        - "{output_path}"
+        - "pdf"
+      # PDF rendering (HTML layout + paint) is heavier than a
+      # text-writer pass, so a roomier ceiling than the 30s
+      # default.
+      timeout_seconds: 120
+    request:
+      flags:
+        - name: from
+          flag: -f
+          type: text
+        - name: standalone
+          flag: -s
+          type: bool
+    uploads:
+      - field_name: document
+        placeholder: input_path
+        temp_dir: /tmp/pandoc/uploads
+    output_files:
+      - placeholder: output_path
+        filename_placeholder: output_filename
+        output_dir: /tmp/pandoc/outputs
+        suffix: .pdf
     output:
       mode: text
 

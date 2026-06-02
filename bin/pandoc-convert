@@ -44,6 +44,20 @@ if [ ! -f "$INPUT" ]; then
     exit 66
 fi
 
+if [ "$WRITER" = "pdf" ]; then
+    # No LaTeX/TeX backend in the image. Produce PDF via
+    # weasyprint's HTML/CSS engine. pandoc infers PDF from the
+    # .pdf output extension, so omit ``-t`` (there is no
+    # ``-t pdf`` writer) and point it at the engine. The extra
+    # flags ($@) from url2code's flag rendering (-f / -s) are
+    # forwarded the same as for any other target.
+    exec pandoc \
+        -o "$OUTPUT" \
+        --pdf-engine=weasyprint \
+        "$@" \
+        "$INPUT" 2>&1
+fi
+
 exec pandoc \
     -t "$WRITER" \
     -o "$OUTPUT" \

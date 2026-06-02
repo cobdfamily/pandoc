@@ -10,6 +10,30 @@ empty and is filled forward from this point.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-01
+
+### Added
+- **PDF output at `POST /v1/to/pdf`** — rendered via
+  `pandoc --pdf-engine=weasyprint` (an HTML/CSS engine), so no
+  TeX/texlive backend is bundled (avoids a ~5 GB layer). New
+  `pdf` catalog entry (document family); the `pandoc-convert`
+  wrapper special-cases the `pdf` writer to drop `-t` (pandoc
+  infers PDF from the `.pdf` output extension) and pass
+  `--pdf-engine=weasyprint`. The Dockerfile installs weasyprint
+  + its runtime libs (`libpango-1.0-0`, `libpangoft2-1.0-0`,
+  `fonts-dejavu-core`). New e2e test asserts the `%PDF` magic.
+
+### Changed
+- `api.version` `1.0.0 -> 1.1.0`.
+
+### Deferred
+- **citeproc / bibliography** (the other half of roadmap Sprint
+  12) is not in this release. Wiring a bibliography file needs
+  an *optional* multipart upload, but url2code uploads are
+  mandatory — so citeproc needs either a dedicated endpoint or a
+  new engine "optional uploads" feature first. Tracked as a
+  follow-up.
+
 ## [1.0.0] - 2026-06-01
 
 First tagged release of pandoc. Captures the existing surface
@@ -38,4 +62,5 @@ plus this sprint's standardization work.
 - No bibliography / citeproc yet (roadmap Sprint 12). One
   conversion per request.
 
+[1.1.0]: https://github.com/cobdfamily/pandoc/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/cobdfamily/pandoc/commits/v1.0.0
