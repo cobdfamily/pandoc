@@ -32,3 +32,16 @@ services:
       retries: 12
       start_period: 5s
     restart: unless-stopped
+    # Container hardening (fleet standard, matches needle):
+    # lock the root filesystem, drop all Linux capabilities,
+    # and block privilege escalation. url2code writes uploads
+    # and converted outputs under /tmp/pandoc/* (the executor
+    # mkdir -p's them per request), so /tmp is a writable
+    # tmpfs rather than the read-only root.
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
