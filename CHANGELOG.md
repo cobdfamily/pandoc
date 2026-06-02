@@ -10,6 +10,23 @@ empty and is filled forward from this point.
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-06-01
+
+### Fixed
+- PDF conversion (`/v1/to/pdf`) failed at runtime under the
+  hardened read-only-root container:
+  `pandoc: .: openTempFile: permission denied (Read-only file
+  system)`. pandoc writes its PDF intermediate into the working
+  directory (`/app`, read-only). `bin/pandoc-convert` now `cd`s
+  into a tmpfs scratch dir for the PDF path before invoking
+  pandoc, and compose sets `HOME=/tmp` so weasyprint's fontconfig
+  cache lands on the writable tmpfs. Surfaced by the e2e suite
+  running against the hardened compose; 1.1.0's PDF path was
+  broken at runtime.
+
+### Changed
+- `api.version` `1.1.0 -> 1.1.1`.
+
 ## [1.1.0] - 2026-06-01
 
 ### Added
@@ -62,5 +79,6 @@ plus this sprint's standardization work.
 - No bibliography / citeproc yet (roadmap Sprint 12). One
   conversion per request.
 
+[1.1.1]: https://github.com/cobdfamily/pandoc/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/cobdfamily/pandoc/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/cobdfamily/pandoc/commits/v1.0.0

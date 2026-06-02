@@ -32,6 +32,13 @@ services:
       retries: 12
       start_period: 5s
     restart: unless-stopped
+    environment:
+      # weasyprint (the PDF engine) writes fontconfig / cache
+      # files under $HOME; with a read-only root, point HOME at
+      # the writable tmpfs. (pandoc's own PDF intermediate is
+      # handled by bin/pandoc-convert cd-ing into a tmpfs scratch
+      # dir before invoking pandoc.)
+      HOME: /tmp
     # Container hardening (fleet standard, matches needle):
     # lock the root filesystem, drop all Linux capabilities,
     # and block privilege escalation. url2code writes uploads

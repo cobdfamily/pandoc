@@ -51,11 +51,21 @@ if [ "$WRITER" = "pdf" ]; then
     # ``-t pdf`` writer) and point it at the engine. The extra
     # flags ($@) from url2code's flag rendering (-f / -s) are
     # forwarded the same as for any other target.
-    exec pandoc \
+    #
+    # pandoc writes its PDF intermediate into the *current
+    # directory*, which is /app — read-only under container
+    # hardening (read_only root + tmpfs /tmp). Run from a writable
+    # scratch dir on the tmpfs. INPUT and OUTPUT are absolute, so
+    # the cd doesn't disturb them.
+    SCRATCH="$(mktemp -d)"
+    trap 'rm -rf "$SCRATCH"' EXIT
+    cd "$SCRATCH"
+    pandoc \
         -o "$OUTPUT" \
         --pdf-engine=weasyprint \
         "$@" \
         "$INPUT" 2>&1
+    exit $?
 fi
 
 exec pandoc \
